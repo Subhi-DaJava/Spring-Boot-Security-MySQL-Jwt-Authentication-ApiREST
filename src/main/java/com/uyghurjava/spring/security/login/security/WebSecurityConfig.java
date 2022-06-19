@@ -1,5 +1,6 @@
 package com.uyghurjava.spring.security.login.security;
 
+import com.uyghurjava.spring.security.login.security.services.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
