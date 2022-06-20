@@ -1,7 +1,5 @@
 package com.uyghurjava.spring.security.login.payload.response;
 
-import com.uyghurjava.spring.security.login.models.Role;
-
 import java.util.List;
 
 public class UserInfoResponse {
@@ -9,9 +7,9 @@ public class UserInfoResponse {
     private Long id;
     private String username;
     private String email;
-    private List<Role> roles;
+    private List<String> roles;
 
-    public UserInfoResponse(Long id, String username, String email, List<Role> roles) {
+    public UserInfoResponse(Long id, String username, String email, List<String> roles) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -42,11 +40,11 @@ public class UserInfoResponse {
         this.email = email;
     }
 
-    public List<Role> getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 }

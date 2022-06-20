@@ -1,7 +1,5 @@
 package com.uyghurjava.spring.security.login.payload.request;
 
-import com.uyghurjava.spring.security.login.models.Role;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -18,7 +16,13 @@ public class SignupRequest {
     @Email
     private String email;
 
-    private Set<Role> role;
+
+    private Set<String> role;
+
+    @NotBlank
+    @Size(min = 8, max = 40)
+    private String password;
+
 
     public String getUsername() {
         return username;
@@ -36,11 +40,19 @@ public class SignupRequest {
         this.email = email;
     }
 
-    public Set<Role> getRole() {
+    public Set<String> getRole() {
         return role;
     }
 
-    public void setRole(Set<Role> role) {
+    public void setRole(Set<String> role) {
         this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
