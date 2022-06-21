@@ -43,11 +43,13 @@
 ### Repository : has interfaces that extend Spring Data JPA JpaRepository to interact with Database.
 #### Repository contains `UserRepository` & `RoleRepository` to work with `Database`, will be imported into `Controller`.
 
-### Models : defines two main models for Authentication (User) & Authorization (Role). They have many-to-many relationship.
-##### ● User : id, username, email, password, roles
-##### ● Role : id, name
+### Models : 
+#### Defines two main models for Authentication (User) & Authorization (Role). They have many-to-many relationship.
+#### ● User : id, username, email, password, roles
+#### ● Role : id, name
 
-### Payload : defines classes for `Request` and `Response` objects
+### Payload : 
+#### Defines classes for `Request` and `Response` objects
 #### We also have `application.properties` for configuring Spring Datasource, Spring Data JPA and `App properties` (such as `JWT Secret string` or `Token expiration time`).
 
 ### Controller : handle signup/login requests & authorized requests
@@ -66,7 +68,8 @@
 #### MySQL latest Version
 #### Maven 3.8.4
 
-### Security : Configure Spring Security & implement Security Objects
+### Security :
+#### Configure Spring Security & implement Security Objects
 #### ● `WebSecurityConfig` extends `WebSecurityConfigurerAdapter`
 #### ● `UserDetailsServiceImpl` implements `UserDetailsService`
 #### ● `UserDetailsImpl` implements `UserDetails`
@@ -74,9 +77,10 @@
 #### ● `AuthTokenFilter` extends `OncePerRequestFilter`
 #### ● `JwtUtils` provides methods for `generating`, `parsing`, `validating JWT`
 
-### Run with command: mvn spring-boot:run or Run IDE, check the database: testdb_mysql_auth(create if not existing)
+### Create Project and Run App:
+#### 1.Create and Setup a new project(all dependencies needed) or clone the url GitHub 2.Configure the application.properties 3.Insert the date into tables(check the existence of the Database) 4.Run with command: mvn spring-boot:run or Run IDE, check the database: testdb_mysql_auth(create if not existing)
 
-#### Exécute the queries :
+### Exécute the queries :
 #### INSERT INTO roles(name) VALUES('ROLE_USER');
 #### INSERT INTO roles(name) VALUES('ROLE_MODERATOR');
 #### INSERT INTO roles(name) VALUES('ROLE_ADMIN');
