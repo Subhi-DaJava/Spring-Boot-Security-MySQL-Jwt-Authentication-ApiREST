@@ -1,5 +1,7 @@
 package com.uyghurjava.spring.security.login.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -26,9 +28,10 @@ public class User {
     private String email;
     @NotBlank
     @Size(max = 120)
+    @JsonIgnore
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY) //fetch = FetchType.EAGER --> we should new HashSet<>
     @JoinTable(name = "user_roles",
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "role_id"))

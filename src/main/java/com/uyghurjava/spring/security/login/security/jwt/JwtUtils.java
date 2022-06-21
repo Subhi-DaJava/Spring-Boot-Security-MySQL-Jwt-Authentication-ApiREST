@@ -91,4 +91,10 @@ public class JwtUtils {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
+
+    //TODO: create refresh-token and Map<String, String> idToken = new HashMap<>(); put two tokens in Map
+    //IdToken.put("access-token", secret);
+    //idToken.pun("refresh-token", secret)
+    //response.setContentType("application/json");
+    //new ObjectMapper().writeValue(response.getOutputStream, idToken);
 }

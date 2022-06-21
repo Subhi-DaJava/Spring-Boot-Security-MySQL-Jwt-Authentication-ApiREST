@@ -1,12 +1,19 @@
 package com.uyghurjava.spring.security.login.controller;
 
+import com.uyghurjava.spring.security.login.models.User;
+import com.uyghurjava.spring.security.login.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.util.List;
 
 /**
  * Controller for testing Authorization
@@ -32,9 +39,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
+    private final UserRepository userRepository;
+
+    public TestController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @GetMapping("/all")
     public String allAccess(){
-        return "You have the right fot the Public Content";
+        return "You have the right for the Public Content.";
     }
 
     @GetMapping("/user")
@@ -45,17 +58,32 @@ public class TestController {
     }
 
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public String adminAccess(){
         logger.info("Hi, Admin ! (TestController)");
-        return "Hi, Admin !, welcome to Admin Dashboard";
+        return "Hi, Admin !, welcome to Admin Dashboard.";
     }
 
     @GetMapping("/mod")
     @PreAuthorize("hasRole('MODERATOR')")
     public String moderatorAccess(){
         logger.info("Hi, Moderator ! (TestController)");
-        return "Hi, Moderator !, welcome to our Moderator Dashboard";
+        return "Hi, Moderator !, welcome to our Moderator Dashboard.";
+    }
+
+    @GetMapping("/admin/allUsers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<User>> showAllUsers(){
+        List<User> users = userRepository.findAll();
+        logger.info("All users are here(TestController).");
+        return ResponseEntity.ok().body(users);
+    }
+
+    @GetMapping("user/profil")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USER') or hasAuthority('ROLE_MODERATOR')")
+    public User profile(Principal principal){
+        return userRepository.findByUsername(principal.getName())
+                .orElseThrow( () -> new RuntimeException("This user with username=" + principal.getName() + "doesn't exist!!"));
     }
 
 }

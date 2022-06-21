@@ -13,17 +13,22 @@ import com.uyghurjava.spring.security.login.security.jwt.JwtUtils;
 import com.uyghurjava.spring.security.login.security.services.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
@@ -57,16 +62,28 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    @Autowired
+
+    @Value(("uyghurcoder.app.jwtCookieName"))
+    private String jwtCookie;
+
+    final
     AuthenticationManager authenticationManager;
-    @Autowired
+    final
     UserRepository userRepository;
-    @Autowired
+    final
     RoleRepository roleRepository;
-    @Autowired
+    final
     PasswordEncoder encoder;
-    @Autowired
+    final
     JwtUtils jwtUtils;
+
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, JwtUtils jwtUtils) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.encoder = encoder;
+        this.jwtUtils = jwtUtils;
+    }
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
@@ -153,4 +170,63 @@ public class AuthController {
                 .body(new MessageResponse("You have been signed out perfectly!"));
     }
 
+    @PostMapping("/admin/addRole")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MEDERATOR')")
+    @Transactional
+    public ResponseEntity<?> addRoleToUser(@Valid @RequestParam String username, @RequestParam String roleName){
+
+        logger.debug("This method addRoleToUser(AuthController) starts here");
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("This user with username= " + username + " doesn't exist in DB (from method addRole -> AuthController)"));
+
+
+        Set<Role> userRoles = user.getRoles();
+
+        if(userRoles.contains(roleName)){
+            return ResponseEntity.ok().body(new MessageResponse("This roleName=" + roleName + " is already added to this user with username=" + username));
+        }
+        //TODO: Create a check if roleName equals any String sauf 'mod','admin' or 'user'
+        if(roleName == null || roleName.isEmpty()){
+            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+            userRoles.add(userRole);
+        } else {
+            switch (roleName) {
+                    case "admin":
+                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+                        userRoles.add(adminRole);
+                        break;
+                    case "mod":
+                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+                        userRoles.add(modRole);
+                        break;
+                    default: // unknown roleName
+                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+                        userRoles.add(userRole);
+                }
+
+        }
+
+        user.setRoles(userRoles);
+        userRepository.save(user);
+
+        logger.info("AuthenticateUser(AuthController) is successful!");
+
+        return ResponseEntity.ok().body(new MessageResponse("This roleName={" + roleName + "} is successfully added to this user with username={" + username + "}"));
+    }
+
+    //TODO: method for Refresh Token
+    @GetMapping("/refreshToken")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response){
+
+        String authToken = request.getHeader(jwtCookie);
+        if(authToken != null && authToken.startsWith("Bearer")){
+            String refreshToken = authToken.substring(7);
+            // verify the signature
+        }
+    }
 }
