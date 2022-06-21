@@ -13,17 +13,17 @@
 #### By User’s role (admin, moderator, user), we authorize the User to access resources.
 
 ### APIs :
-![img.png](img.png)
+![img.png](src/main/resources/dataInfo/img.png)
 
 ### Flow of Spring Boot Security Login example:
-![img_2.png](img_2.png)
+![img_1.png](src/main/resources/dataInfo/img_1.png)
 
 ### Note* : A legal JWT will be stored in "HttpOnly Cookie" if Client accesses protected resources.
-![img_3.png](img_3.png)
+![img_2.png](src/main/resources/dataInfo/img_2.png)
 #### More details at: Spring Boot Refresh Token with JWT example : https://www.bezkoder.com/spring-boot-refresh-token-jwt/
 
 ### Spring Boot Architecture with Spring Security :
-![img_4.png](img_4.png)
+![img_3.png](src/main/resources/dataInfo/img_3.png)
 
 ### Spring Security :
 #### – WebSecurityConfigurerAdapter is the crux of our security implementation.
